@@ -50,15 +50,17 @@ void motor_update(motor_t motor)
   {
     digitalWrite(12, motor_0.fwd ? HIGH : LOW); // Establishes direction of Channel A
     digitalWrite(9, motor_0.brake ? HIGH : LOW);   // Brake for Channel A
-    uint8_t speed = motor_0.speed * motor_0.multiplier;
-    analogWrite(3, speed);   // Spins the motor on Channel A
+    //uint8_t s = motor_0.speed ;//* motor_0.multiplier;
+    //Serial.print("Speed = ");
+    Serial.println(s);
+    analogWrite(3, s);   // Spins the motor on Channel A
   }
   else if(motor.id == MOTOR1)
   {
     digitalWrite(13, motor_1.fwd ? HIGH : LOW);  // Establishes direction of Channel B
     digitalWrite(8, motor_1.brake ? HIGH : LOW);   // Brake for Channel B
-    uint8_t speed = motor_1.speed * motor_1.multiplier;
-    analogWrite(11, speed);    // Spins the motor on Channel B
+    uint8_t s = motor_1.speed ;//* motor_1.multiplier;
+    analogWrite(11, s);    // Spins the motor on Channel B
   }
 }
 
@@ -112,7 +114,7 @@ void loop()
 {
   if (irrecv.decode(&results))
   {
-    Serial.println(results.value, HEX);
+    //Serial.println(results.value, HEX);
     irrecv.resume(); // Receive the next value
 
     switch(results.value)
@@ -120,17 +122,23 @@ void loop()
       case IR_1:
         motor_0.multiplier = 0.33;
         motor_1.multiplier = 0.33;
+        //delay(100);
         ir_release_btn();
+        Serial.println("Set multiplier 1");
         break;
       case IR_2:
         motor_0.multiplier = 0.67;
         motor_1.multiplier = 0.67;
+        //delay(100);
         ir_release_btn();
+        Serial.println("Set multiplier 2");
         break;
       case IR_3:
         motor_0.multiplier = 1;
         motor_1.multiplier = 1;
+        //delay(100);
         ir_release_btn();
+        Serial.println("Set multiplier 3");
         break;
         
       case IR_UP:
@@ -169,7 +177,7 @@ void loop()
       
       case IR_LEFT:
         Serial.println("Left");
-        motor_0.speed = 125;
+        motor_0.speed = 170;
         motor_0.fwd = true;
         motor_0.brake = false;
         motor_1.speed = 255;
@@ -189,7 +197,7 @@ void loop()
         motor_0.speed = 255;
         motor_0.fwd = true;
         motor_0.brake = false;
-        motor_1.speed = 125;
+        motor_1.speed = 170;
         motor_1.fwd = true;
         motor_1.brake = false;
         motor_update();
@@ -232,12 +240,12 @@ void loop()
         motor_update();
 
         break;
+        
+        default:
+        delay(100);
     }
-    
-    motor_update(motor_0);
-    motor_update(motor_1);
   }
-  delay(100);
+  //delay(100);
 }
 
 
