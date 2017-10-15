@@ -38,7 +38,7 @@ typedef struct
   uint8_t id;
   bool brake = false;
   bool fwd = true;
-  uint8_t speed = 0;
+  uint8_t spd = 0;
   float multiplier = 1;
 } motor_t;
 
@@ -50,16 +50,14 @@ void motor_update(motor_t motor)
   {
     digitalWrite(12, motor_0.fwd ? HIGH : LOW); // Establishes direction of Channel A
     digitalWrite(9, motor_0.brake ? HIGH : LOW);   // Brake for Channel A
-    //uint8_t s = motor_0.speed ;//* motor_0.multiplier;
-    //Serial.print("Speed = ");
-    Serial.println(s);
+    uint8_t s = motor_0.spd * motor_0.multiplier;
     analogWrite(3, s);   // Spins the motor on Channel A
   }
   else if(motor.id == MOTOR1)
   {
     digitalWrite(13, motor_1.fwd ? HIGH : LOW);  // Establishes direction of Channel B
     digitalWrite(8, motor_1.brake ? HIGH : LOW);   // Brake for Channel B
-    uint8_t s = motor_1.speed ;//* motor_1.multiplier;
+    uint8_t s = motor_1.spd * motor_1.multiplier;
     analogWrite(11, s);    // Spins the motor on Channel B
   }
 }
@@ -78,10 +76,12 @@ void motor_init()
   //Setup Channel A
   pinMode(12, OUTPUT); //Initiates Motor Channel A pin
   pinMode(9, OUTPUT); //Initiates Brake Channel A pin
+  pinMode(3, OUTPUT);
 
   //Setup Channel B
   pinMode(13, OUTPUT); //Initiates Motor Channel A pin
   pinMode(8, OUTPUT);  //Initiates Brake Channel A pin
+  pinMode(11, OUTPUT);
 }
 
 void ir_release_btn()
@@ -115,7 +115,7 @@ void loop()
   if (irrecv.decode(&results))
   {
     //Serial.println(results.value, HEX);
-    irrecv.resume(); // Receive the next value
+    //irrecv.resume(); // Receive the next value
 
     switch(results.value)
     {
@@ -127,8 +127,8 @@ void loop()
         Serial.println("Set multiplier 1");
         break;
       case IR_2:
-        motor_0.multiplier = 0.67;
-        motor_1.multiplier = 0.67;
+        motor_0.multiplier = 0.5;
+        motor_1.multiplier = 0.5;
         //delay(100);
         ir_release_btn();
         Serial.println("Set multiplier 2");
@@ -143,10 +143,10 @@ void loop()
         
       case IR_UP:
         Serial.println("Forward");
-        motor_0.speed = 255;
+        motor_0.spd = 255;
         motor_0.fwd = true;
         motor_0.brake = false;
-        motor_1.speed = 255;
+        motor_1.spd = 255;
         motor_1.fwd = true;
         motor_1.brake = false;
         motor_update();
@@ -160,10 +160,10 @@ void loop()
 
       case IR_DOWN:
         Serial.println("Back");
-        motor_0.speed = 255;
+        motor_0.spd = 255;
         motor_0.fwd = false;
         motor_0.brake = false;
-        motor_1.speed = 255;
+        motor_1.spd = 255;
         motor_1.fwd = false;
         motor_1.brake = false;
         motor_update();
@@ -177,10 +177,10 @@ void loop()
       
       case IR_LEFT:
         Serial.println("Left");
-        motor_0.speed = 170;
+        motor_0.spd = 130;
         motor_0.fwd = true;
         motor_0.brake = false;
-        motor_1.speed = 255;
+        motor_1.spd = 255;
         motor_1.fwd = true;
         motor_1.brake = false;
         motor_update();
@@ -194,10 +194,10 @@ void loop()
         
       case IR_RIGHT:
         Serial.println("Right");
-        motor_0.speed = 255;
+        motor_0.spd = 255;
         motor_0.fwd = true;
         motor_0.brake = false;
-        motor_1.speed = 170;
+        motor_1.spd = 130;
         motor_1.fwd = true;
         motor_1.brake = false;
         motor_update();
@@ -211,10 +211,10 @@ void loop()
 
         case IR_STAR:
         Serial.println("Rotate CW");
-        motor_0.speed = 255;
+        motor_0.spd = 255;
         motor_0.fwd = false;
         motor_0.brake = false;
-        motor_1.speed = 255;
+        motor_1.spd = 255;
         motor_1.fwd = true;
         motor_1.brake = false;
         motor_update();
@@ -226,10 +226,10 @@ void loop()
 
         case IR_POUND:
         Serial.println("Rotate CCW");
-        motor_0.speed = 255;
+        motor_0.spd = 255;
         motor_0.fwd = true;
         motor_0.brake = false;
-        motor_1.speed = 255;
+        motor_1.spd = 255;
         motor_1.fwd = false;
         motor_1.brake = false;
         motor_update();
@@ -242,6 +242,7 @@ void loop()
         break;
         
         default:
+        irrecv.resume();
         delay(100);
     }
   }
